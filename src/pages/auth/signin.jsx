@@ -33,8 +33,8 @@ const Signin = () => {
       toastSuccess();
       setInUser(findedUser[0]);
       setTimeout(() => {
-        reset();
         nav(-1);
+        reset();
       }, 2200);
     } else {
       toastError();
@@ -98,7 +98,7 @@ const Signin = () => {
           >
             Log in
           </Button>
-          Or <Link to="/auth/signin">register now!</Link>
+          Or <Link to="/signup">register now!</Link>
         </Form.Item>
       </Form>
       <ToastContainer

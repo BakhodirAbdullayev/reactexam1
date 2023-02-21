@@ -14,10 +14,11 @@ const Head = styled.div`
   width: 100%;
   display: flex;
   justify-content: space-between;
-  align-items: flex-end;
+  align-items: flex-start;
   gap: 40px;
   border-bottom: 1px solid #d9d9d9;
   padding-bottom: 8px;
+  line-height: 1;
 `;
 const PostTitle = styled.div`
   max-width: 700px;

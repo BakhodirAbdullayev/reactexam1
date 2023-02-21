@@ -40,12 +40,13 @@ const Pag = styled.div`
 const Posts = () => {
   const [posts, setPosts] = useState([]);
   const [current, setCurrent] = useState(1);
+  const [limit, setLimit] = useState(10);
 
   useEffect(() => {
     instance
-      .get(`/posts?_page=${current}&_limit=10`)
+      .get(`/posts?_page=${current}&_limit=${limit}`)
       .then((r) => setPosts(r?.data));
-  }, [current]);
+  }, [current, limit]);
 
   return (
     <Container>
@@ -66,11 +67,13 @@ const Posts = () => {
       <Pag>
         <Pagination
           current={current}
-          onChange={(e) => setCurrent(e)}
+          onChange={(e, l) => {
+            setCurrent(e);
+            setLimit(l);
+          }}
           total={100}
           responsive={true}
         />
-        ;
       </Pag>
     </Container>
   );
