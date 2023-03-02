@@ -82,9 +82,11 @@ const Cards = styled.div`
   justify-content: space-between;
   gap: 10px;
 
-  /* position: relative;
-  top: -100px;
-  z-index: 100; */
+  @media screen and (max-width: 680px) {
+    grid-template-columns: repeat(1, minmax(260px, 400px));
+    justify-content: center;
+    gap: 20px;
+  }
 `;
 
 const Card = styled.div`

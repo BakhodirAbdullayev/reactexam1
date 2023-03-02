@@ -31,7 +31,15 @@ const Container = styled.div`
       &:hover {
         color: #59c1bd;
       }
+      @media screen and (max-width: 900px) {
+        margin: 15px auto 0;
+      }
     }
+  }
+  @media screen and (max-width: 900px) {
+    grid-template-columns: repeat(1, 1fr);
+    text-align: center;
+    justify-content: center;
   }
 `;
 const Wrapper = styled.div`
@@ -54,6 +62,10 @@ const Wrapper = styled.div`
       color: #59c1bd;
     }
   }
+  @media screen and (max-widht: 680px) {
+    text-align: center;
+    padding: 80px 30px;
+  }
 `;
 const Title = styled.div`
   font-size: 36px;
@@ -64,6 +76,9 @@ const Text = styled.p`
   font-size: 20px;
   margin: 30px 0 45px;
   line-height: 1.5;
+  @media screen and (max-widht: 680px) {
+    text-align: center;
+  }
 `;
 const End = styled.div`
   width: 100%;
@@ -82,7 +97,13 @@ const Cards = styled.div`
   display: grid;
   justify-content: space-between;
   gap: 15px;
-  grid-template-columns: repeat(3, minmax(220px, 380px));
+  grid-template-columns: repeat(3, minmax(200px, 380px));
+  @media screen and (max-width: 680px) {
+    grid-template-columns: repeat(1, minmax(260px, 400px));
+    align-items: center;
+    justify-content: center;
+    gap: 25px;
+  }
 `;
 const Card = styled.div`
   background-color: #f9f9f9;
@@ -121,7 +142,7 @@ const Special = () => {
           <Link>Learn more</Link>
         </div>
       </Container>
-      <Wrapper>
+      <Wrapper className={"nimadir"}>
         <Title>our mission</Title>
         <Text>
           Forest Therapy is a research-based framework for supporting healing

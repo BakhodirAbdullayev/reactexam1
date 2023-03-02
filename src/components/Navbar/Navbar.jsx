@@ -1,6 +1,7 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import styled from "styled-components";
 import { Link, NavLink } from "react-router-dom";
+import { HiBars3 } from "react-icons/hi2";
 import { AuthContext } from "../../utils/context";
 import {
   UserOutlined,
@@ -40,9 +41,20 @@ const NavLogo = styled(Link)`
 const Right = styled.div`
   display: flex;
   align-items: center;
+  gap: 20px;
 `;
 const NavbarLinksWrapper = styled(Right)`
   gap: 15px;
+  @media screen and (max-width: 700px) {
+    position: fixed;
+    top: 80px;
+    left: ${(p) => (p.bool ? "0px" : "-100%")};
+    width: 50%;
+    background-color: #f2f4f8;
+    height: calc(100vh - 80px);
+    flex-direction: column;
+    padding-top: 40px;
+  }
 `;
 const NavbarLink = styled(NavLink)`
   padding: 5px 12px;
@@ -93,6 +105,7 @@ const Account = styled.div`
 
 const Navbar = () => {
   const { inUser, setInUser } = useContext(AuthContext);
+  const [bool, setBool] = useState(false);
 
   const showConfirm = () => {
     confirm({
@@ -140,11 +153,16 @@ const Navbar = () => {
       <Container>
         <NavLogo>Logo</NavLogo>
         <Right>
-          <NavbarLinksWrapper>
+          <NavbarLinksWrapper bool={bool}>
             <NavbarLink to="/">Home</NavbarLink>
             <NavbarLink to="/about">About</NavbarLink>
             <NavbarLink to="/users">Users</NavbarLink>
             <NavbarLink to="/posts">Posts</NavbarLink>
+          </NavbarLinksWrapper>
+          <NavBtns>
+            <LinksBtn onClick={() => setBool((e) => !e)}>
+              <HiBars3 />
+            </LinksBtn>
             {inUser ? (
               <Account>
                 <Dropdown
@@ -180,7 +198,7 @@ const Navbar = () => {
                 <SignLink to="/signup">Sign Up</SignLink>
               </Sign>
             )}
-          </NavbarLinksWrapper>
+          </NavBtns>
         </Right>
       </Container>
       <Bottom />
@@ -189,3 +207,21 @@ const Navbar = () => {
 };
 
 export default Navbar;
+
+const NavBtns = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 10px;
+`;
+const LinksBtn = styled.button`
+  font-size: 20px;
+  border: none;
+  outline: none;
+  background: none;
+  display: none;
+  place-items: center;
+  cursor: pointer;
+  @media screen and (max-widht: 700px) {
+    display: grid;
+  }
+`;
