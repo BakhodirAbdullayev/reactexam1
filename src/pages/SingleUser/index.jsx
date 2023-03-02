@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { useParams, Link } from "react-router-dom";
-import { instance } from "../../utils/axios";
+// import { instance } from "../../utils/axios";
 import { SiGooglemessages } from "react-icons/si";
 import { MdOutlinePhotoLibrary, MdFormatListBulleted } from "react-icons/md";
 import { Tabs, Card } from "antd";
+import { getData } from "../../utils/getDataFunction";
+import { useQuery } from "@tanstack/react-query";
 
 const Container = styled.div`
   width: 100%;
@@ -31,26 +33,41 @@ const TabWrapper = styled.div`
 `;
 
 const SingleUser = () => {
-  const [user, setUser] = useState(null);
-  const [tagData, setTagData] = useState([]);
+  // const [user, setUser] = useState(null);
+  // const [tagData, setTagData] = useState([]);
   const [activeTag, setActiveTag] = useState("posts");
 
   const { id } = useParams();
 
-  useEffect(() => {
-    instance.get(`/users/${id}`).then((r) => setUser(r.data));
-  }, [id]);
-  useEffect(() => {
-    instance.get(`/users/${id + "/" + activeTag}`).then((r) => {
-      setTagData(r.data);
-    });
-  }, [activeTag]);
+  // useEffect(() => {
+  //   instance.get(`/users/${id}`).then((r) => setUser(r.data));
+  // }, [id]);
+
+  const user = useQuery({
+    queryKey: ["user"],
+    queryFN: () => getData(`/users/${id}`),
+    enabled: !!id,
+  });
+
+  // useEffect(() => {
+  //   instance.get(`/users/${id + "/" + activeTag}`).then((r) => {
+  //     setTagData(r.data);
+  //   });
+  // }, [activeTag]);
+
+  const tagData = useQuery({
+    queryKey: ["tagData"],
+    queryFn: () => getData(`/users/${id + "/" + activeTag}`),
+    enabled: !!activeTag,
+    cacheTime: 0,
+  });
+  console.log(tagData);
 
   return (
-    user && (
+    user?.data && (
       <Container>
-        <Name>{user?.name}</Name>
-        <Username>{user?.username}</Username>
+        <Name>{user?.data?.data?.name}</Name>
+        <Username>{user?.data?.data?.username}</Username>
         <TabWrapper>
           <Tabs
             onChange={(e) => setActiveTag(tabNav[e - 1].name)}
@@ -74,14 +91,15 @@ const SingleUser = () => {
                   </div>
                 ),
                 key: idx,
-                children:
-                  tagData && t.name == "posts" ? (
-                    <Posts posts={tagData} id={id} />
-                  ) : t.name == "albums" ? (
-                    <Albums albums={tagData} id={id} />
-                  ) : t.name == "todos" ? (
-                    <Todos todos={tagData} />
-                  ) : null,
+                children: tagData?.isLoading ? (
+                  "Loading"
+                ) : t.name == "posts" ? (
+                  <Posts posts={tagData?.data?.data} id={id} />
+                ) : t.name == "albums" ? (
+                  <Albums albums={tagData?.data?.data} id={id} />
+                ) : t.name == "todos" ? (
+                  <Todos todos={tagData?.data?.data} />
+                ) : null,
               };
             })}
           />
@@ -174,7 +192,11 @@ const Todos = ({ todos }) => {
   return (
     <TodosWrap bordered={false}>
       {todos &&
-        todos.map((t) => <Card.Grid style={gridStyle}>{t.title}</Card.Grid>)}
+        todos.map((t, i) => (
+          <Card.Grid style={gridStyle} key={i}>
+            {t.title}
+          </Card.Grid>
+        ))}
     </TodosWrap>
   );
 };

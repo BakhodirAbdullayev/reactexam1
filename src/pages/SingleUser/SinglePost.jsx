@@ -3,6 +3,8 @@ import { useParams } from "react-router-dom";
 import styled from "styled-components";
 import { instance } from "../../utils/axios";
 import { Card } from "antd";
+import { useQuery } from "@tanstack/react-query";
+import { getData } from "../../utils/getDataFunction";
 
 const Post = styled.div`
   max-width: 1000px;
@@ -36,23 +38,35 @@ const CommentsWrap = styled(Card)`
 `;
 
 const SinglePost = () => {
-  const [post, setPost] = useState(null);
-  const [comments, setComments] = useState([]);
+  // const [post, setPost] = useState(null);
+  // const [comments, setComments] = useState([]);
   const { postId } = useParams();
 
-  useEffect(() => {
-    instance.get(`/posts/${postId}`).then((r) => setPost(r?.data));
-    instance
-      .get(`/comments?postId=${postId}`)
-      .then((r) => setComments(r?.data));
-  }, [postId]);
+  const post = useQuery({
+    queryKey: ["singlePost"],
+    queryFn: () => getData(`/posts/${postId}`),
+    enabled: !!postId,
+  });
+
+  const comments = useQuery({
+    queryKey: ["comments"],
+    queryFn: () => getData(`/comments?postId=${postId}`),
+    enabled: !!postId,
+  });
+
+  // useEffect(() => {
+  //   instance.get(`/posts/${postId}`).then((r) => setPost(r?.data));
+  //   instance
+  //     .get(`/comments?postId=${postId}`)
+  //     .then((r) => setComments(r?.data));
+  // }, [postId]);
 
   return (
     <div>
       <Post>
-        <Title>{post?.title}</Title>
-        <Body>{post?.body}</Body>
-        <Comments comments={comments} />
+        <Title>{post?.data?.data?.title}</Title>
+        <Body>{post?.data?.data?.body}</Body>
+        <Comments comments={comments?.data?.data} />
       </Post>
     </div>
   );

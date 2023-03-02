@@ -1,9 +1,69 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import styled from "styled-components";
-import { instance } from "../../utils/axios";
+// import { instance } from "../../utils/axios";
 import { Card } from "antd";
 import { Comments } from "../SingleUser/SinglePost";
+import { useQuery } from "@tanstack/react-query";
+import { getData } from "../../utils/getDataFunction";
+
+const SinglePost = () => {
+  // const [post, setPost] = useState({});
+  // const [comments, setComments] = useState([]);
+  // const [postUser, setPostUSer] = useState({});
+  const { postId } = useParams();
+
+  const post = useQuery({
+    queryKey: ["post"],
+    queryFn: () => getData(`/posts/${postId}`),
+    enabled: !!postId,
+  });
+
+  const comments = useQuery({
+    queryKey: ["comments"],
+    queryFn: () => getData(`/posts/${postId}/comments`),
+    enabled: !!postId,
+  });
+
+  // console.log(post, "post");
+  // console.log(comments, "comment");
+
+  // useEffect(() => {
+  //   instance.get(`/posts/${postId}`).then((r) => setPost(r?.data));
+  //   instance.get(`/posts/${postId}/comments`).then((r) => setComments(r?.data));
+  // }, [postId]);
+
+  const postUser = useQuery({
+    queryKey: ["postUser"],
+    queryFn: () => getData(`/users/${postId}`),
+    enabled: !!post,
+  });
+  // console.log(postUser, "postUser");
+
+  // useEffect(() => {
+  //   instance.get(`/users/${postId}`).then((r) => setPostUSer(r?.data));
+  // }, [post]);
+
+  return (
+    <Container>
+      {!post?.isLoading && !comments?.isLoading && !postUser?.isLoading && (
+        <>
+          <Head>
+            <PostTitle>{post?.data?.data?.title}</PostTitle>
+            <PostUserData>
+              <Name>{postUser?.data?.data?.name}</Name>
+              <UserName>{postUser?.username}</UserName>
+            </PostUserData>
+          </Head>
+          <PostText>{post?.data?.data?.body}</PostText>
+          <Comments comments={comments?.data?.data} />
+        </>
+      )}
+    </Container>
+  );
+};
+
+export default SinglePost;
 
 const Container = styled(Card)`
   width: 100%;
@@ -43,35 +103,3 @@ const PostText = styled.div`
   text-align: justify;
   font-size: 18px;
 `;
-
-const SinglePost = () => {
-  const [post, setPost] = useState({});
-  const [comments, setComments] = useState([]);
-  const [postUser, setPostUSer] = useState({});
-  const { postId } = useParams();
-
-  useEffect(() => {
-    instance.get(`/posts/${postId}`).then((r) => setPost(r?.data));
-    instance.get(`/posts/${postId}/comments`).then((r) => setComments(r?.data));
-  }, [postId]);
-
-  useEffect(() => {
-    instance.get(`/users/${postId}`).then((r) => setPostUSer(r?.data));
-  }, [post]);
-
-  return (
-    <Container>
-      <Head>
-        <PostTitle>{post?.title}</PostTitle>
-        <PostUserData>
-          <Name>{postUser?.name}</Name>
-          <UserName>{postUser?.username}</UserName>
-        </PostUserData>
-      </Head>
-      <PostText>{post?.body}</PostText>
-      <Comments comments={comments} />
-    </Container>
-  );
-};
-
-export default SinglePost;

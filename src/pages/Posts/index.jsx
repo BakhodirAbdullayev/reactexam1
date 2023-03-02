@@ -1,8 +1,62 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import { instance } from "../../utils/axios";
+// import { instance } from "../../utils/axios";
 import { Link } from "react-router-dom";
 import { Card, Pagination } from "antd";
+import { useQuery } from "@tanstack/react-query";
+import { getData } from "../../utils/getDataFunction";
+
+const Posts = () => {
+  // const [posts, setPosts] = useState([]);
+  const [current, setCurrent] = useState(1);
+  const [limit, setLimit] = useState(10);
+
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ["posts", current, limit],
+    queryFn: () => getData(`/posts?_page=${current}&_limit=${limit}`),
+    enabled: !!current || !!limit,
+  });
+
+  // useEffect(() => {
+  //   instance
+  //     .get(`/posts?_page=${current}&_limit=${limit}`)
+  //     .then((r) => setPosts(r?.data));
+  // }, [current, limit]);
+
+  return (
+    <Container>
+      <Title>All Posts</Title>
+      <AllPosts>
+        {isLoading
+          ? "Loading..."
+          : data?.data?.map((p) => (
+              <Card
+                key={p?.id}
+                hoverable={true}
+                type="inner"
+                title={p?.title}
+                extra={<Link to={`/posts/${p?.id}`}>More</Link>}
+              >
+                {p?.body}
+              </Card>
+            ))}
+      </AllPosts>
+      <Pag>
+        <Pagination
+          current={current}
+          onChange={(e, l) => {
+            setCurrent(e);
+            setLimit(l);
+          }}
+          total={100}
+          responsive={true}
+        />
+      </Pag>
+    </Container>
+  );
+};
+
+export default Posts;
 
 const Container = styled.div`
   width: 100%;
@@ -36,47 +90,3 @@ const Pag = styled.div`
   display: grid;
   place-items: center;
 `;
-
-const Posts = () => {
-  const [posts, setPosts] = useState([]);
-  const [current, setCurrent] = useState(1);
-  const [limit, setLimit] = useState(10);
-
-  useEffect(() => {
-    instance
-      .get(`/posts?_page=${current}&_limit=${limit}`)
-      .then((r) => setPosts(r?.data));
-  }, [current, limit]);
-
-  return (
-    <Container>
-      <Title>All Posts</Title>
-      <AllPosts>
-        {posts.map((p) => (
-          <Card
-            key={p?.id}
-            hoverable={true}
-            type="inner"
-            title={p?.title}
-            extra={<Link to={`/posts/${p?.id}`}>More</Link>}
-          >
-            {p?.body}
-          </Card>
-        ))}
-      </AllPosts>
-      <Pag>
-        <Pagination
-          current={current}
-          onChange={(e, l) => {
-            setCurrent(e);
-            setLimit(l);
-          }}
-          total={100}
-          responsive={true}
-        />
-      </Pag>
-    </Container>
-  );
-};
-
-export default Posts;
